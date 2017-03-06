@@ -1,65 +1,53 @@
 # multi-command README
 
-This is the README for your extension "multi-command". After writing up a brief description, we recommend including the following sections.
+This extension can create command sequence as one command and bind a key.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+* create command sequence as one command and bind a key.
+* set interval between each command execution
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Settings has 2 steps.
 
-For example:
+1. Create command sequence as one command in settings.json.  
+    For example:
+    ```json:settings.json
+    "multiCommand.commands": [
+        {
+            "command": "multiCommand.down3Lines",
+            "sequence": [
+                "cursorDown",
+                "cursorDown",
+                "cursorDown"
+            ]
+        },
+        {
+            "command": "multiCommand.swapChar",
+            "interval": 30,
+            "sequence": [
+                "cursorLeftSelect",
+                "editor.action.clipboardCutAction",
+                "cursorRight",
+                "editor.action.clipboardPasteAction"
+            ]
+        }
+    ]
+    ```
+    First sequence is named "multiCommand.down3Lines" and executes "cursorDown" command 3 times.
+    Second sequence is named "multiCommand.swapChar". This sequence swaps cursor's left character and the right character. If the command is executed asynchronousely, you can set time interval between each command execution using "interval" configuration(milliseconds).
 
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+2. Bind a key to created command sequence in keybindings.json.  
+    For example:
+    ```json:keybindings.json
+    { "key": "F1", "command": "multiCommand.down3Lines", "when": "editorTextFocus"},
+    { "key": "F2", "command": "multiCommand.swapChar", "when": "editorTextFocus"}
+    ```
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
+Initial release.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

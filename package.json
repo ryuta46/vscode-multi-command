@@ -2,7 +2,7 @@
     "name": "multi-command",
     "displayName": "multi-command",
     "description": "Invoke multiple commands as one command.",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "ryuta46",
     "engines": {
         "vscode": "^1.10.0"
@@ -11,14 +11,41 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "*"
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-            "command": "extension.sayHello",
-            "title": "Hello World"
-        }]
+        "configuration": {
+            "type": "object",
+            "title": "multi-command",
+            "properties": {
+                "multiCommand.commands": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "command sequence",
+                        "properties": {
+                            "command": {
+                                "type": "string",
+                                "description": "command name of this command sequence"
+                            },
+                            "interval": {
+                                "type": "number",
+                                "description": "time interval(milliseconds) between each command execution."
+                            },
+                            "sequence": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "descrition": "command sequence which been invoked"
+                                }
+                            }
+                        }
+                    },
+                    "description": "command sequence list."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
