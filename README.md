@@ -5,7 +5,7 @@ This extension can create command sequence as one command and bind a key.
 ## Features
 
 * create command sequence as one command and bind a key.
-* set interval between each command execution
+* set interval between each command execution.
 
 ## Extension Settings
 
@@ -36,7 +36,8 @@ Settings has 2 steps.
     ]
     ```
     First sequence is named "multiCommand.down3Lines" and executes "cursorDown" command 3 times.
-    Second sequence is named "multiCommand.swapChar". This sequence swaps cursor's left character and the right character. If the command is executed asynchronousely, you can set time interval between each command execution using "interval" configuration(milliseconds).
+
+    Second sequence is named "multiCommand.swapChar". This sequence swaps cursor's left character and the right character. If a command is executed asynchronousely, you can set time interval between each command execution using "interval" configuration(milliseconds).
 
 2. Bind a key to created command sequence in keybindings.json.  
     For example:
