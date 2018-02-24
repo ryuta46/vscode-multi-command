@@ -2,12 +2,17 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { Disposable } from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+function refreshUserCommands(context: vscode.ExtensionContext) {
     let configuration = vscode.workspace.getConfiguration("multiCommand");
     let commands = configuration.get<Array<Object>>("commands");
+    
+    // Dispose current settings.
+    var element: Disposable = null;
+    while((element = context.subscriptions.pop()) != null){
+        element.dispose();
+    }
     
     commands.forEach((value: Object) => {
         let command:string = value["command"];
@@ -35,6 +40,17 @@ export function activate(context: vscode.ExtensionContext) {
             });
             executeCommandFunctions[invoke.length - 1]();
         }));
+    });
+}
+
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+export function activate(context: vscode.ExtensionContext) {
+
+    refreshUserCommands(context);
+
+    vscode.workspace.onDidChangeConfiguration(() => {
+        refreshUserCommands(context);
     });
 }
 

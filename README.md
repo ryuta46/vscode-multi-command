@@ -48,6 +48,11 @@ Settings has 2 steps.
 
 ## Release Notes
 
+### 1.1.0
+
+Reload settings.json when the file is changed.  
+Now, you can use a custom multi-command immediately after adding it in the settings.json without restarting vscode.
+
 ### 1.0.0
 
 Initial release.
