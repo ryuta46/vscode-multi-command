@@ -4,6 +4,10 @@
     "description": "Invoke multiple commands as one command.",
     "version": "1.1.0",
     "publisher": "ryuta46",
+    "repository" : { 
+        "type" : "git", 
+        "url" : "https://github.com/ryuta46/vscode-multi-command.git"
+    }, 
     "engines": {
         "vscode": "^1.10.0"
     },
