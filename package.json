@@ -2,7 +2,7 @@
     "name": "multi-command",
     "displayName": "multi-command",
     "description": "Invoke multiple commands as one command.",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "publisher": "ryuta46",
     "repository" : { 
         "type" : "git", 
@@ -40,8 +40,8 @@
                             "sequence": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "descrition": "command sequence which been invoked"
+                                    "type": ["string", "object"],
+                                    "description": "command sequence which been invoked"
                                 }
                             }
                         }

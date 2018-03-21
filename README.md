@@ -46,11 +46,35 @@ Settings has 2 steps.
     { "key": "F2", "command": "multiCommand.swapChar", "when": "editorTextFocus"}
     ```
 
+### Advanced Settings
+
+#### Pass arguments to commands
+
+You can pass arguments to commands by defining a command sequence with `args` parameter.
+For Example:
+
+```json:settings.json
+{
+    "command": "multiCommand.cutAndType",
+    "sequence": [
+       "editor.action.clipboardCutAction",
+       {"command": "type", "args": {"text": "CUT !!"}}
+    ]
+}
+```
+
+This sequence cut selected text and type "CUT !!".
+
+
 ## Release Notes
+
+### 1.2.0
+
+New Feature: Pass arguments to commands.
 
 ### 1.1.0
 
-Reload settings.json when the file is changed.  
+Reloads settings.json when the file is changed.  
 Now, you can use a custom multi-command immediately after adding it in the settings.json without restarting vscode.
 
 ### 1.0.0
