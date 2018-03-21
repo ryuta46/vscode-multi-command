@@ -4,9 +4,32 @@
 import * as vscode from 'vscode';
 import { Disposable } from 'vscode';
 
+class Command {
+    private exe: string
+    private args: any
+
+    constructor(commandText: string | object) {
+        if (typeof(commandText) === 'string') {
+            this.exe = commandText
+            this.args = null
+        } else {
+            this.exe = commandText['command']
+            this.args = commandText['args']
+        }
+    }
+
+    public execute() {
+        if (this.args === null) {
+            return vscode.commands.executeCommand(this.exe)
+        } else {
+            return vscode.commands.executeCommand(this.exe, this.args)
+        }
+    }
+}
+
 function refreshUserCommands(context: vscode.ExtensionContext) {
     let configuration = vscode.workspace.getConfiguration("multiCommand");
-    let commands = configuration.get<Array<Object>>("commands");
+    let commands = configuration.get<Array<object>>("commands");
     
     // Dispose current settings.
     var element: Disposable = null;
@@ -14,22 +37,24 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
         element.dispose();
     }
     
-    commands.forEach((value: Object) => {
-        let command:string = value["command"];
-        let interval:number = value["interval"];
-        let invoke:Array<string> = value["sequence"];
-        invoke = invoke.reverse();
+    commands.forEach((value: object) => {
+        let command: string = value["command"];
+        let interval: number = value["interval"];
+        let sequence: Array<Command> = (value["sequence"] as Array<string | object>).map(
+            commandText => new Command(commandText))
+
+        sequence = sequence.reverse();
 
         context.subscriptions.push(vscode.commands.registerCommand(command, () => {
             let executeCommandFunctions: Array<Function> = []
-            invoke.forEach((oneCommand: string, index: number) => {
+            sequence.forEach((oneCommand: Command, index: number) => {
                 if (index == 0) {
                     executeCommandFunctions.push(() => {
-                        vscode.commands.executeCommand(oneCommand);
+                        oneCommand.execute();
                     });
                 } else {
                     executeCommandFunctions.push(() => {
-                        vscode.commands.executeCommand(oneCommand).then(async () => {
+                        oneCommand.execute().then(async () => {
                             if (interval !== null) {
                                 await delay(interval);
                             }
@@ -38,7 +63,7 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
                     });
                 }
             });
-            executeCommandFunctions[invoke.length - 1]();
+            executeCommandFunctions[sequence.length - 1]();
         }));
     });
 }
