@@ -1,22 +1,20 @@
-'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { Disposable } from 'vscode';
+
+interface CommandSettings{
+    command: string,
+    interval: number,
+    sequence: Array<string | ComplexCommand>
+}
+
+interface ComplexCommand {
+    command: string,
+    args: object
+}
 
 class Command {
-    private exe: string
-    private args: any
-
-    constructor(commandText: string | object) {
-        if (typeof(commandText) === 'string') {
-            this.exe = commandText
-            this.args = null
-        } else {
-            this.exe = commandText['command']
-            this.args = commandText['args']
-        }
-    }
+    constructor(private readonly exe: string, private readonly args: object | null) {}
 
     public execute() {
         if (this.args === null) {
@@ -29,43 +27,40 @@ class Command {
 
 function refreshUserCommands(context: vscode.ExtensionContext) {
     let configuration = vscode.workspace.getConfiguration("multiCommand");
-    let commands = configuration.get<Array<object>>("commands");
-    
+    let commands = configuration.get<Array<CommandSettings>>("commands");
+
     // Dispose current settings.
-    var element: Disposable = null;
-    while((element = context.subscriptions.pop()) != null){
+    for (let element of context.subscriptions) {
         element.dispose();
     }
-    
-    commands.forEach((value: object) => {
-        let command: string = value["command"];
-        let interval: number = value["interval"];
-        let sequence: Array<Command> = (value["sequence"] as Array<string | object>).map(
-            commandText => new Command(commandText))
 
-        sequence = sequence.reverse();
+    if (!commands) {
+        return;
+    }
 
-        context.subscriptions.push(vscode.commands.registerCommand(command, () => {
-            let executeCommandFunctions: Array<Function> = []
-            sequence.forEach((oneCommand: Command, index: number) => {
-                if (index == 0) {
-                    executeCommandFunctions.push(() => {
-                        oneCommand.execute();
-                    });
-                } else {
-                    executeCommandFunctions.push(() => {
-                        oneCommand.execute().then(async () => {
-                            if (interval !== null) {
-                                await delay(interval);
-                            }
-                            executeCommandFunctions[index - 1]();
-                        });
-                    });
-                }
-            });
-            executeCommandFunctions[sequence.length - 1]();
+    for (let commandSettings of commands) {
+        let commandName = commandSettings.command;
+        let interval = commandSettings.interval;
+        let sequence = commandSettings.sequence.map(command => {
+            let exe: string;
+            let args: object | null;
+            if (typeof(command) === "string" ) {
+                exe = command;
+                args = null;
+            } else {
+                exe = command.command;
+                args = command.args;
+            }
+            return new Command(exe, args);
+        });
+
+        context.subscriptions.push(vscode.commands.registerCommand(commandName, async () => {
+            for (let command of sequence) {
+                await command.execute();
+                await delay(interval);
+            }
         }));
-    });
+    }
 }
 
 // this method is called when your extension is activated
