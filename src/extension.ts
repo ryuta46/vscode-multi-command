@@ -6,6 +6,8 @@ import {MultiCommand} from "./multiCommand";
 
 interface CommandSettings{
     command: string,
+    label: string,
+    description: string,
     interval: number,
     sequence: Array<string | ComplexCommand>
 }
@@ -33,6 +35,8 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
 
     for (let commandSettings of commands) {
         const id = commandSettings.command;
+        const label = commandSettings.label;
+        const description = commandSettings.description;
         const interval = commandSettings.interval;
         const sequence = commandSettings.sequence.map(command => {
             let exe: string;
@@ -47,7 +51,8 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
             return new Command(exe, args);
         });
 
-        const multiCommand = new MultiCommand(id, interval, sequence);
+
+        const multiCommand = new MultiCommand(id, label, description, interval, sequence);
         multiCommands.push(multiCommand);
 
         context.subscriptions.push(vscode.commands.registerCommand(id, async () => {
@@ -86,8 +91,8 @@ export function deactivate() {
 export async function pickMultiCommand() {
     const picks = multiCommands.map(multiCommand => {
         return {
-            label: multiCommand.id,
-            description: "",
+            label: multiCommand.label || multiCommand.id,
+            description: multiCommand.description || "",
             multiCommand: multiCommand
         }
     });
