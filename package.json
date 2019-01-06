@@ -4,10 +4,10 @@
     "description": "Invoke multiple commands as one command.",
     "version": "1.2.0",
     "publisher": "ryuta46",
-    "repository" : { 
-        "type" : "git", 
-        "url" : "https://github.com/ryuta46/vscode-multi-command.git"
-    }, 
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ryuta46/vscode-multi-command.git"
+    },
     "engines": {
         "vscode": "^1.10.0"
     },
@@ -40,7 +40,10 @@
                             "sequence": {
                                 "type": "array",
                                 "items": {
-                                    "type": ["string", "object"],
+                                    "type": [
+                                        "string",
+                                        "object"
+                                    ],
                                     "description": "command sequence which been invoked"
                                 }
                             }
