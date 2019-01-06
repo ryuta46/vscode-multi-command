@@ -1,6 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import {Command} from "./command";
+import {MultiCommand} from "./multiCommand";
 
 interface CommandSettings{
     command: string,
@@ -13,17 +15,7 @@ interface ComplexCommand {
     args: object
 }
 
-class Command {
-    constructor(private readonly exe: string, private readonly args: object | null) {}
-
-    public execute() {
-        if (this.args === null) {
-            return vscode.commands.executeCommand(this.exe)
-        } else {
-            return vscode.commands.executeCommand(this.exe, this.args)
-        }
-    }
-}
+let multiCommands: Array<MultiCommand>;
 
 function refreshUserCommands(context: vscode.ExtensionContext) {
     let configuration = vscode.workspace.getConfiguration("multiCommand");
@@ -37,11 +29,12 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
     if (!commands) {
         return;
     }
+    multiCommands = [];
 
     for (let commandSettings of commands) {
-        let commandName = commandSettings.command;
-        let interval = commandSettings.interval;
-        let sequence = commandSettings.sequence.map(command => {
+        const id = commandSettings.command;
+        const interval = commandSettings.interval;
+        const sequence = commandSettings.sequence.map(command => {
             let exe: string;
             let args: object | null;
             if (typeof(command) === "string" ) {
@@ -54,13 +47,14 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
             return new Command(exe, args);
         });
 
-        context.subscriptions.push(vscode.commands.registerCommand(commandName, async () => {
-            for (let command of sequence) {
-                await command.execute();
-                await delay(interval);
-            }
+        const multiCommand = new MultiCommand(id, interval, sequence);
+        multiCommands.push(multiCommand);
+
+        context.subscriptions.push(vscode.commands.registerCommand(id, async () => {
+            await multiCommand.execute();
         }));
     }
+
 }
 
 // this method is called when your extension is activated
@@ -72,12 +66,39 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration(() => {
         refreshUserCommands(context);
     });
+
+    vscode.commands.registerCommand('extension.multiCommand.execute', async () => {
+        try {
+            await pickMultiCommand();
+        }
+        catch (e) {
+            vscode.window.showErrorMessage(`${e.message}`);
+        }
+    });
+
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
 }
 
-function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+
+export async function pickMultiCommand() {
+    const picks = multiCommands.map(multiCommand => {
+        return {
+            label: multiCommand.id,
+            description: "",
+            multiCommand: multiCommand
+        }
+    });
+
+    const item = await vscode.window.showQuickPick(picks, {
+        placeHolder: `Select one of the multi commands...`,
+    });
+
+    if (!item) {
+        return;
+    }
+    await item.multiCommand.execute();
 }
+

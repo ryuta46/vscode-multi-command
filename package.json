@@ -19,6 +19,13 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "commands": [
+            {
+                "command": "extension.multiCommand.execute",
+                "title": "Execute multi command",
+                "category": "Multi command"
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "multi-command",
