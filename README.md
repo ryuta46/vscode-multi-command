@@ -43,9 +43,28 @@ Settings has 2 steps.
 2. Bind a key to created command sequence in keybindings.json.  
     For example:
     ```json
+    { 
+        "key": "F1", 
+        "command": "extension.multiCommand.execute" , 
+        "args": { "command": "multiCommand.down3Lines" },
+        "when": "editorTextFocus"
+    },
+    { 
+        "key": "F21", 
+        "command": "extension.multiCommand.execute" , 
+        "args": { "command": "multiCommand.swapChar" },
+        "when": "editorTextFocus"
+    }
+    ```
+
+    You can bind a key to the command directly.
+
+    For example:
+    ```json
     { "key": "F1", "command": "multiCommand.down3Lines", "when": "editorTextFocus"},
     { "key": "F2", "command": "multiCommand.swapChar", "when": "editorTextFocus"}
     ```
+    But when you use this key bind style, Visual Studio Code may warn about the command name. see: https://github.com/ryuta46/vscode-multi-command/issues/16
 
 ### Manual Execution
 
@@ -104,6 +123,10 @@ This sequence cut selected text and type "CUT !!".
 
 
 ## Release Notes
+
+### 1.4.0
+
+Added new style for binding a key to created commands.
 
 ### 1.3.0
 
