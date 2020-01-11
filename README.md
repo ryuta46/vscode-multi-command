@@ -122,6 +122,15 @@ For Example:
 This sequence cut selected text and type "CUT !!".
 
 
+### Find the name of the command you want to execute
+
+1. Execute "Developer: Set Log Level..." and select "trace" in the command palette.
+
+2. Execute command of you want to know the name.
+    
+3. You can see the name in output panel for Log(Window) process( you can set the process for output in the rightside of the output panel).
+![command-name-output.png](assets/command-name-output.png)
+
 ## Release Notes
 
 ### 1.4.0
