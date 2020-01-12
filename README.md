@@ -43,9 +43,28 @@ Settings has 2 steps.
 2. Bind a key to created command sequence in keybindings.json.  
     For example:
     ```json
+    { 
+        "key": "F1", 
+        "command": "extension.multiCommand.execute" , 
+        "args": { "command": "multiCommand.down3Lines" },
+        "when": "editorTextFocus"
+    },
+    { 
+        "key": "F21", 
+        "command": "extension.multiCommand.execute" , 
+        "args": { "command": "multiCommand.swapChar" },
+        "when": "editorTextFocus"
+    }
+    ```
+
+    You can bind a key to the command directly.
+
+    For example:
+    ```json
     { "key": "F1", "command": "multiCommand.down3Lines", "when": "editorTextFocus"},
     { "key": "F2", "command": "multiCommand.swapChar", "when": "editorTextFocus"}
     ```
+    But when you use this key bind style, Visual Studio Code may warn about the command name. see: https://github.com/ryuta46/vscode-multi-command/issues/16
 
 ### Manual Execution
 
@@ -103,7 +122,20 @@ For Example:
 This sequence cut selected text and type "CUT !!".
 
 
+### Find the name of the command you want to execute
+
+1. Execute "Developer: Set Log Level..." and select "trace" in the command palette.
+
+2. Execute command of you want to know the name.
+    
+3. You can see the name in output panel for Log(Window) process( you can set the process for output in the rightside of the output panel).
+![command-name-output.png](assets/command-name-output.png)
+
 ## Release Notes
+
+### 1.4.0
+
+Added new style for binding a key to created commands.
 
 ### 1.3.0
 

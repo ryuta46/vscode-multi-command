@@ -72,9 +72,14 @@ export function activate(context: vscode.ExtensionContext) {
         refreshUserCommands(context);
     });
 
-    vscode.commands.registerCommand('extension.multiCommand.execute', async () => {
+    vscode.commands.registerCommand('extension.multiCommand.execute', async (args = {}) => {
         try {
-            await pickMultiCommand();
+            if (args.command) {
+                await vscode.commands.executeCommand(args.command);
+            }
+            else {
+                await pickMultiCommand();
+            }
         }
         catch (e) {
             vscode.window.showErrorMessage(`${e.message}`);
