@@ -131,6 +131,24 @@ This sequence cut selected text and type "CUT !!".
 3. You can see the name in output panel for Log(Window) process( you can set the process for output in the rightside of the output panel).
 ![command-name-output.png](assets/command-name-output.png)
 
+### Using shell commands in a command sequence
+
+You can use shell commands in a command sequence by using [Command Runner](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) extension together.
+
+With Command Runner extension, you can write a command sequence with shell commands as:
+
+```json
+{
+    "command": "multiCommand.checkoutDevelop",
+    "sequence": [
+        { "command": "command-runner.run", "args": {"command": "git checkout develop"} },
+        "git.sync"
+    ]
+}
+```
+
+See the [Command Runner document](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) for details on how to use the extension.
+
 ## Release Notes
 
 ### 1.4.0
