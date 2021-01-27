@@ -10,10 +10,36 @@ This extension can create command sequence as one command and bind a key, or cal
 
 ## Extension Settings
 
-Settings has 2 steps.
+There is simple usage that uses only keybindings.json and a usage that uses settings.json.
+
+### Simple Usage with keybindings.json
+
+In keybindings.json, bind a key to `extension.multiCommand.execute` with passing a command sequence you want to execute as the argument.  
+For example:
+
+```json
+{
+    "key": "alt+x",
+    "command": "extension.multiCommand.execute",
+    "args": { 
+        "sequence": [
+            "cursorDown",
+            "cursorDown",
+            "cursorDown"
+        ]
+    }
+}
+```
+This command sequence executes "cursorDown" command 3 times.
+
+### Usage with settings.json.
+
+This usage is useful for resusing the defined command sequence in another command sequnce or executing the sequence manually.
+
+In case using settings.json, the settings has 2 steps.
 
 1. Create command sequence as one command in settings.json.  
-   For example:
+    For example:
 
     ```json
     "multiCommand.commands": [
@@ -41,6 +67,20 @@ Settings has 2 steps.
     First sequence is named "multiCommand.down3Lines" and executes "cursorDown" command 3 times.
 
     Second sequence is named "multiCommand.swapChar". This sequence swaps cursor's left character and the right character. If a command is executed asynchronousely, you can set time interval between each command execution using "interval" configuration(milliseconds).
+
+    You can also use an object style that uses the command name as a key instead of an array.
+    ```json
+    "multiCommand.commands": {
+        "multiCommand.down3Lines": {
+            "sequence": [
+                "cursorDown",
+                "cursorDown",
+                "cursorDown"
+            ]
+        }
+    }
+    ```
+    This style is useful when you want to merge user settings and the workspace settings.
 
 2. Bind a key to created command sequence in keybindings.json.  
    For example:
@@ -166,6 +206,10 @@ With Command Runner extension, you can write a command sequence with shell comma
 See the [Command Runner document](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) for details on how to use the extension.
 
 ## Release Notes
+
+### 1.5.0
+New Feature: Simple usage only with keybindings.json  
+New Feature: Object style settings for merging user settings and workspace settings.
 
 ### 1.4.0
 
