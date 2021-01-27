@@ -31,7 +31,10 @@
             "title": "multi-command",
             "properties": {
                 "multiCommand.commands": {
-                    "type": "array",
+                    "type": [
+                        "array",
+                        "object"
+                    ],
                     "items": {
                         "type": "object",
                         "title": "command sequence",
