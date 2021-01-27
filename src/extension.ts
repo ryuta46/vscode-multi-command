@@ -28,6 +28,29 @@ function implementsCommandMap(arg: any): arg is CommandSettings {
     return arg !== null && typeof arg === "object";
 }
 
+function createMultiCommand(
+    id: string,
+    settings: CommandSettings
+): MultiCommand {
+    const label = settings.label;
+    const description = settings.description;
+    const interval = settings.interval;
+    const sequence = settings.sequence.map((command) => {
+        let exe: string;
+        let args: object | null;
+        if (typeof command === "string") {
+            exe = command;
+            args = null;
+        } else {
+            exe = command.command;
+            args = command.args;
+        }
+        return new Command(exe, args);
+    });
+
+    return new MultiCommand(id, label, description, interval, sequence);
+}
+
 let multiCommands: Array<MultiCommand>;
 
 function refreshUserCommands(context: vscode.ExtensionContext) {
@@ -61,34 +84,11 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
     multiCommands = [];
 
     commands.forEach((value: CommandSettings, key: string) => {
-        const id = key;
-        const label = value.label;
-        const description = value.description;
-        const interval = value.interval;
-        const sequence = value.sequence.map((command) => {
-            let exe: string;
-            let args: object | null;
-            if (typeof command === "string") {
-                exe = command;
-                args = null;
-            } else {
-                exe = command.command;
-                args = command.args;
-            }
-            return new Command(exe, args);
-        });
-
-        const multiCommand = new MultiCommand(
-            id,
-            label,
-            description,
-            interval,
-            sequence
-        );
+        const multiCommand = createMultiCommand(key, value);
         multiCommands.push(multiCommand);
 
         context.subscriptions.push(
-            vscode.commands.registerCommand(id, async () => {
+            vscode.commands.registerCommand(key, async () => {
                 await multiCommand.execute();
             })
         );
@@ -110,6 +110,9 @@ export function activate(context: vscode.ExtensionContext) {
             try {
                 if (args.command) {
                     await vscode.commands.executeCommand(args.command);
+                } else if (args.sequence) {
+                    const multiCommand = createMultiCommand("", args);
+                    await multiCommand.execute();
                 } else {
                     await pickMultiCommand();
                 }
