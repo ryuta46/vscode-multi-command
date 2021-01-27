@@ -1,47 +1,69 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import {Command} from "./command";
-import {MultiCommand} from "./multiCommand";
+import * as vscode from "vscode";
+import { Command } from "./command";
+import { MultiCommand } from "./multiCommand";
 
-interface CommandSettings{
-    command: string,
-    label: string,
-    description: string,
-    interval: number,
-    sequence: Array<string | ComplexCommand>
+interface CommandSettings {
+    label: string;
+    description: string;
+    interval: number;
+    sequence: Array<string | ComplexCommand>;
+}
+
+interface CommandSettingsWithKey extends CommandSettings {
+    command: string;
+}
+
+interface CommandMap {
+    [key: string]: CommandSettings;
 }
 
 interface ComplexCommand {
-    command: string,
-    args: object
+    command: string;
+    args: object;
 }
+
+function implementsCommandMap(arg: any): arg is CommandSettings {
+    return arg !== null && typeof arg === "object";
+}
+
 
 let multiCommands: Array<MultiCommand>;
 
 function refreshUserCommands(context: vscode.ExtensionContext) {
     let configuration = vscode.workspace.getConfiguration("multiCommand");
-    let commands = configuration.get<Array<CommandSettings>>("commands");
+
+    let commands = new Map<string, CommandSettings>();
+
+    let commandList = configuration.get<Array<CommandSettingsWithKey> | CommandMap>("commands") || [];
 
     // Dispose current settings.
     for (let element of context.subscriptions) {
         element.dispose();
     }
 
-    if (!commands) {
-        return;
+    if (Array.isArray(commandList)) {
+        for (let commandSettingsWithKey of commandList) {
+            commands.set(commandSettingsWithKey.command, commandSettingsWithKey);
+        }
+    } else if (implementsCommandMap(commandList)) {
+        let commandObject = commandList as CommandMap;
+        Object.keys(commandObject).forEach((key: string) => {
+            commands.set(key, commandObject[key]);
+        });
     }
     multiCommands = [];
 
-    for (let commandSettings of commands) {
-        const id = commandSettings.command;
-        const label = commandSettings.label;
-        const description = commandSettings.description;
-        const interval = commandSettings.interval;
-        const sequence = commandSettings.sequence.map(command => {
+    commands.forEach((value: CommandSettings, key: string) => {
+        const id = key;
+        const label = value.label;
+        const description = value.description;
+        const interval = value.interval;
+        const sequence = value.sequence.map((command) => {
             let exe: string;
             let args: object | null;
-            if (typeof(command) === "string" ) {
+            if (typeof(command) === "string") {
                 exe = command;
                 args = null;
             } else {
@@ -51,15 +73,13 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
             return new Command(exe, args);
         });
 
-
         const multiCommand = new MultiCommand(id, label, description, interval, sequence);
         multiCommands.push(multiCommand);
 
         context.subscriptions.push(vscode.commands.registerCommand(id, async () => {
             await multiCommand.execute();
         }));
-    }
-
+    });
 }
 
 // this method is called when your extension is activated
