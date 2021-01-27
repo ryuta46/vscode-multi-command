@@ -46,7 +46,7 @@ Settings has 2 steps.
    For example:
 
     ```json
-    ({
+    {
         "key": "F1",
         "command": "extension.multiCommand.execute",
         "args": { "command": "multiCommand.down3Lines" },
@@ -57,7 +57,7 @@ Settings has 2 steps.
         "command": "extension.multiCommand.execute",
         "args": { "command": "multiCommand.swapChar" },
         "when": "editorTextFocus"
-    })
+    }
     ```
 
     You can bind a key to the command directly.
@@ -65,7 +65,7 @@ Settings has 2 steps.
     For example:
 
     ```json
-    ({
+    {
         "key": "F1",
         "command": "multiCommand.down3Lines",
         "when": "editorTextFocus"
@@ -74,7 +74,7 @@ Settings has 2 steps.
         "key": "F2",
         "command": "multiCommand.swapChar",
         "when": "editorTextFocus"
-    })
+    }
     ```
 
     But when you use this key bind style, Visual Studio Code may warn about the command name. see: https://github.com/ryuta46/vscode-multi-command/issues/16
