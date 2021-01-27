@@ -28,7 +28,6 @@ function implementsCommandMap(arg: any): arg is CommandSettings {
     return arg !== null && typeof arg === "object";
 }
 
-
 let multiCommands: Array<MultiCommand>;
 
 function refreshUserCommands(context: vscode.ExtensionContext) {
@@ -36,7 +35,10 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
 
     let commands = new Map<string, CommandSettings>();
 
-    let commandList = configuration.get<Array<CommandSettingsWithKey> | CommandMap>("commands") || [];
+    let commandList =
+        configuration.get<Array<CommandSettingsWithKey> | CommandMap>(
+            "commands"
+        ) || [];
 
     // Dispose current settings.
     for (let element of context.subscriptions) {
@@ -45,7 +47,10 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
 
     if (Array.isArray(commandList)) {
         for (let commandSettingsWithKey of commandList) {
-            commands.set(commandSettingsWithKey.command, commandSettingsWithKey);
+            commands.set(
+                commandSettingsWithKey.command,
+                commandSettingsWithKey
+            );
         }
     } else if (implementsCommandMap(commandList)) {
         let commandObject = commandList as CommandMap;
@@ -63,7 +68,7 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
         const sequence = value.sequence.map((command) => {
             let exe: string;
             let args: object | null;
-            if (typeof(command) === "string") {
+            if (typeof command === "string") {
                 exe = command;
                 args = null;
             } else {
@@ -73,53 +78,58 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
             return new Command(exe, args);
         });
 
-        const multiCommand = new MultiCommand(id, label, description, interval, sequence);
+        const multiCommand = new MultiCommand(
+            id,
+            label,
+            description,
+            interval,
+            sequence
+        );
         multiCommands.push(multiCommand);
 
-        context.subscriptions.push(vscode.commands.registerCommand(id, async () => {
-            await multiCommand.execute();
-        }));
+        context.subscriptions.push(
+            vscode.commands.registerCommand(id, async () => {
+                await multiCommand.execute();
+            })
+        );
     });
 }
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
     refreshUserCommands(context);
 
     vscode.workspace.onDidChangeConfiguration(() => {
         refreshUserCommands(context);
     });
 
-    vscode.commands.registerCommand('extension.multiCommand.execute', async (args = {}) => {
-        try {
-            if (args.command) {
-                await vscode.commands.executeCommand(args.command);
-            }
-            else {
-                await pickMultiCommand();
+    vscode.commands.registerCommand(
+        "extension.multiCommand.execute",
+        async (args = {}) => {
+            try {
+                if (args.command) {
+                    await vscode.commands.executeCommand(args.command);
+                } else {
+                    await pickMultiCommand();
+                }
+            } catch (e) {
+                vscode.window.showErrorMessage(`${e.message}`);
             }
         }
-        catch (e) {
-            vscode.window.showErrorMessage(`${e.message}`);
-        }
-    });
-
+    );
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-}
-
+export function deactivate() {}
 
 export async function pickMultiCommand() {
-    const picks = multiCommands.map(multiCommand => {
+    const picks = multiCommands.map((multiCommand) => {
         return {
             label: multiCommand.label || multiCommand.id,
             description: multiCommand.description || "",
-            multiCommand: multiCommand
-        }
+            multiCommand: multiCommand,
+        };
     });
 
     const item = await vscode.window.showQuickPick(picks, {
@@ -131,4 +141,3 @@ export async function pickMultiCommand() {
     }
     await item.multiCommand.execute();
 }
-
