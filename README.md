@@ -207,6 +207,9 @@ See the [Command Runner document](https://marketplace.visualstudio.com/items?ite
 
 ## Release Notes
 
+### 1.5.1
+Support extensionKind ui or workspace.
+
 ### 1.5.0
 New Feature: Simple usage only with keybindings.json  
 New Feature: Object style settings for merging user settings and workspace settings.
