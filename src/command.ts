@@ -6,7 +6,7 @@ export class Command {
         private readonly args: object | null
     ) {}
 
-    public execute() {
+    public execute(): Thenable<unknown>{
         if (this.args === null) {
             return vscode.commands.executeCommand(this.exe);
         } else {

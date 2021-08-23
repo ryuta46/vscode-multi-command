@@ -109,12 +109,12 @@ export function activate(context: vscode.ExtensionContext) {
         async (args = {}) => {
             try {
                 if (args.command) {
-                    await vscode.commands.executeCommand(args.command);
+                    return await vscode.commands.executeCommand(args.command);
                 } else if (args.sequence) {
                     const multiCommand = createMultiCommand("", args);
-                    await multiCommand.execute();
+                    return await multiCommand.execute();
                 } else {
-                    await pickMultiCommand();
+                    return await pickMultiCommand();
                 }
             } catch (e) {
                 vscode.window.showErrorMessage(`${e.message}`);
