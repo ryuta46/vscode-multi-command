@@ -89,7 +89,7 @@ function refreshUserCommands(context: vscode.ExtensionContext) {
 
         context.subscriptions.push(
             vscode.commands.registerCommand(key, async () => {
-                await multiCommand.execute();
+                await await multiCommand.execute();
             })
         );
     });
@@ -112,9 +112,9 @@ export function activate(context: vscode.ExtensionContext) {
                     return await vscode.commands.executeCommand(args.command);
                 } else if (args.sequence) {
                     const multiCommand = createMultiCommand("", args);
-                    return await multiCommand.execute();
+                    return await await multiCommand.execute();
                 } else {
-                    return await pickMultiCommand();
+                    return await await pickMultiCommand();
                 }
             } catch (e) {
                 vscode.window.showErrorMessage(`${e.message}`);
@@ -126,7 +126,7 @@ export function activate(context: vscode.ExtensionContext) {
 // this method is called when your extension is deactivated
 export function deactivate() {}
 
-export async function pickMultiCommand() {
+export async function pickMultiCommand(): Promise<Thenable<unknown> | undefined> {
     const picks = multiCommands.map((multiCommand) => {
         return {
             label: multiCommand.label || multiCommand.id,

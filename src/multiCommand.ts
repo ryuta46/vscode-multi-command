@@ -9,12 +9,13 @@ export class MultiCommand {
         readonly sequence: Array<Command>
     ) {}
 
-    public async execute(): Promise<Thenable<unknown>> {
-        let lastOutput;
+    public async execute(): Promise<Thenable<unknown> | unknown> {
+        let lastOutput: Thenable<unknown> | undefined;
         for (let command of this.sequence) {
             lastOutput = command.execute();
             await delay(this.interval || 0);
         }
+        
         return lastOutput;
     }
 }
