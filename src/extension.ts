@@ -116,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
                 } else {
                     await pickMultiCommand();
                 }
-            } catch (e) {
+            } catch (e: any) {
                 vscode.window.showErrorMessage(`${e.message}`);
             }
         }
