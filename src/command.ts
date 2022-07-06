@@ -18,6 +18,7 @@ export class Command {
 
     private resolveVariables(args: any ): any {
         if (typeof args === 'string') {
+            args = args.replace(/\${userHome}/g, process.env['HOME'] || '');
             return vscodeVariables(args);
         } else if (typeof args === 'object') {
             let rt: any = {};
