@@ -22,6 +22,7 @@ interface CommandMap {
 interface ComplexCommand {
     command: string;
     args: object;
+    variableSubstitution: boolean;
 }
 
 function implementsCommandMap(arg: any): arg is CommandSettings {
@@ -38,14 +39,17 @@ function createMultiCommand(
     const sequence = settings.sequence.map((command) => {
         let exe: string;
         let args: object | null;
+        let variableSubstitution: boolean;
         if (typeof command === "string") {
             exe = command;
             args = null;
+            variableSubstitution = false;
         } else {
             exe = command.command;
             args = command.args;
+            variableSubstitution = command.variableSubstitution ?? false;
         }
-        return new Command(exe, args);
+        return new Command(exe, args, variableSubstitution);
     });
 
     return new MultiCommand(id, label, description, interval, sequence);
