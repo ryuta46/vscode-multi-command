@@ -34,7 +34,7 @@ This command sequence executes "cursorDown" command 3 times.
 
 ### Usage with settings.json.
 
-This usage is useful for resusing the defined command sequence in another command sequnce or executing the sequence manually.
+This usage is useful for reusing the defined command sequence in another command sequnce or executing the sequence manually.
 
 In case using settings.json, the settings has 2 steps.
 
