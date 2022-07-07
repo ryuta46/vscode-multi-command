@@ -176,6 +176,45 @@ For Example:
 
 This sequence cut selected text and type "CUT !!".
 
+You can also use some variables like `${userHome}` or `${config:editor.fontSize}` in arguments.
+
+Because some commands substitute these kinds of variables in their extensions, variable substitution in multi-command extenstion is kind of experimental.
+
+If you use variable substituion, set `variableSubstitution` to `true` in command setting.
+
+For example: 
+```json
+"sequence": [
+    { 
+        "command": "type",
+        "args": { "text": "Font size is ${config:editor.fontSize}" },
+        "variableSubstitution": true
+    }
+],
+```
+
+Current supported variables:
+
+* `${userHome}`
+* `${workspaceFolder}`
+* `${workspaceFolderBasename}`
+* `${file}`
+* `${fileWorkspaceFolder}`
+* `${relativeFile}`
+* `${relativeFileDirname}`
+* `${fileBasename}`
+* `${fileBasenameNoExtension}`
+* `${fileDirname}`
+* `${fileExtname}`
+* `${cwd}`
+* `${lineNumber}`
+* `${selectedText}`
+* `${pathSeparator}`
+* `${env:*}`
+* `${config:*}`
+
+Contents of each variable are described in [variables reference in VSCode](https://code.visualstudio.com/docs/editor/variables-reference). Note that all variables in the document is not supported in multi-command extension.
+
 ### Find the name of the command you want to execute
 
 1. Execute "Developer: Set Log Level..." and select "trace" in the command palette.
