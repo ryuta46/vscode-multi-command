@@ -81,5 +81,8 @@
         "mocha": "^2.3.3",
         "@types/node": "^7.0.7",
         "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "vscode-variables": "^0.1.3"
     }
 }
