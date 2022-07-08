@@ -4,11 +4,13 @@ import * as vscode from "vscode";
 import { Command } from "./command";
 import { MultiCommand } from "./multiCommand";
 
+type CommandSequence = Array<string | ComplexCommand>;
+
 interface CommandSettings {
     label: string;
     description: string;
     interval: number;
-    sequence: Array<string | ComplexCommand>;
+    sequence: CommandSequence;
 }
 
 interface CommandSettingsWithKey extends CommandSettings {
@@ -22,6 +24,8 @@ interface CommandMap {
 interface ComplexCommand {
     command: string;
     args: object;
+    onSuccess: CommandSequence | undefined;
+    onFail: CommandSequence | undefined;
     variableSubstitution: boolean;
 }
 
@@ -36,20 +40,29 @@ function createMultiCommand(
     const label = settings.label;
     const description = settings.description;
     const interval = settings.interval;
-    const sequence = settings.sequence.map((command) => {
+
+    function createCommand(command: string | ComplexCommand): Command {
         let exe: string;
-        let args: object | null;
+        let args: object | undefined;
         let variableSubstitution: boolean;
+        let onSuccess: Array<Command> | undefined;
+        let onFail: Array<Command> | undefined;
+
         if (typeof command === "string") {
             exe = command;
-            args = null;
             variableSubstitution = false;
         } else {
             exe = command.command;
             args = command.args;
             variableSubstitution = command.variableSubstitution ?? false;
+            onSuccess = command.onSuccess?.map((c) => createCommand(c));            
+            onFail = command.onFail?.map((c) => createCommand(c));
         }
-        return new Command(exe, args, variableSubstitution);
+        return new Command(exe, args, onSuccess, onFail, variableSubstitution);
+    }
+
+    const sequence = settings.sequence.map((command) => {
+        return createCommand(command);
     });
 
     return new MultiCommand(id, label, description, interval, sequence);
