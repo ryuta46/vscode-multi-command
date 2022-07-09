@@ -215,6 +215,40 @@ Current supported variables:
 
 Contents of each variable are described in [variables reference in VSCode](https://code.visualstudio.com/docs/editor/variables-reference). Note that all variables in the document is not supported in multi-command extension.
 
+#### Conditioned commands
+
+A sequence can be branched by the result of whether or not a given command terminated with an error. 
+This feature is useful when you are not sure if an extension is installed or not. You can use an alternative command if the extension is not installed.
+
+For example:
+```json
+{
+    "sequence": [
+        "eslint.executeAutofix || editor.action.formatDocument"
+    ]
+}
+```
+
+Only when `eslint.executeAutofix` finished with an error like command not found, `editor.action.formatDocument` is invoked.
+Note that there must be at least one space on each side of the `||` operator.
+
+For more complex command like passing arguments, use `onFail` field.
+```json
+"sequence": [
+    { 
+        "command": "A",
+        "onFail": [
+            "B",
+            {
+                "command": "C",
+                "args": { "arg": "argumentForC" }
+            },
+        ]
+    }
+]
+```
+Only when command A finished with an error, command B and command C with arguments are invoked.
+
 ### Find the name of the command you want to execute
 
 1. Execute "Developer: Set Log Level..." and select "trace" in the command palette.
