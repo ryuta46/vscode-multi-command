@@ -215,6 +215,41 @@ Current supported variables:
 
 Contents of each variable are described in [variables reference in VSCode](https://code.visualstudio.com/docs/editor/variables-reference). Note that all variables in the document is not supported in multi-command extension.
 
+#### Repeat commands
+
+The above `multiCommand.down3Lines` sample also written as follows by using `repeat` field:
+
+```json
+{
+    "command": "multiCommand.down3Lines",
+    "label": "down3Lines",
+    "description": "down the cursor in 3 times",
+    "sequence": [
+        { "command": "cursorDown", "repeat": 3 }
+    ],
+}
+```
+You can also repeat a sequence by using `extension.multiCommand.execute` or defined command in settings.json.
+
+```json
+{
+    "sequence": [
+        { 
+            "command": "extension.multiCommand.execute", 
+            "args": {
+                "sequence": [
+                    "editor.action.commentLine",
+                    "cursorDown"
+                ]
+            },
+            "repeat": 5 
+        }
+    ],
+}
+```
+
+This sequence add line comment to next 5 lines.
+
 #### Conditioned commands
 
 A sequence can be branched by the result of whether or not a given command terminated with an error. 

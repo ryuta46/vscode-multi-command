@@ -24,6 +24,7 @@ interface CommandMap {
 interface ComplexCommand {
     command: string;
     args: object;
+    repeat: number;
     onSuccess: CommandSequence | undefined;
     onFail: CommandSequence | undefined;
     variableSubstitution: boolean;
@@ -44,6 +45,7 @@ function createMultiCommand(
     function createCommand(command: string | ComplexCommand): Command {
         let exe: string;
         let args: object | undefined;
+        let repeat: number = 1;
         let variableSubstitution: boolean;
         let onSuccess: Array<Command> | undefined;
         let onFail: Array<Command> | undefined;
@@ -61,11 +63,12 @@ function createMultiCommand(
         } else {
             exe = command.command;
             args = command.args;
+            repeat = command.repeat ?? 1;
             variableSubstitution = command.variableSubstitution ?? false;
             onSuccess = command.onSuccess?.map((c) => createCommand(c));
             onFail = command.onFail?.map((c) => createCommand(c));
         }
-        return new Command(exe, args, onSuccess, onFail, variableSubstitution);
+        return new Command(exe, args, repeat, onSuccess, onFail, variableSubstitution);
     }
 
     const sequence = settings.sequence.map((command) => {
