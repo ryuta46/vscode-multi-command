@@ -5,20 +5,36 @@ const vscodeVariables = require('vscode-variables');
 export class Command {
     constructor(
         private readonly exe: string,
-        private readonly args: object | null,
+        private readonly args: object | undefined,
+        private readonly onSuccess: Array<Command> | undefined,
+        private readonly onFail: Array<Command> | undefined,
         private readonly variableSubstitution: boolean
     ) {}
 
-    public execute() {
-        if (this.args === null) {
-            return vscode.commands.executeCommand(this.exe);
-        } else {
-            if (this.variableSubstitution) {
-                return vscode.commands.executeCommand(this.exe, this.substituteVariables(this.args));
+    public async execute() {
+        try {
+            if (this.args) {
+                if (this.variableSubstitution) {
+                    await vscode.commands.executeCommand(this.exe, this.substituteVariables(this.args));
+                } else {
+                    await vscode.commands.executeCommand(this.exe, this.args);
+                }
             } else {
-                return vscode.commands.executeCommand(this.exe, this.args);
+                await vscode.commands.executeCommand(this.exe);
             }
-            
+            if (this.onSuccess) {
+                for (let command of this.onSuccess) {
+                    await command.execute();
+                }
+            }
+        } catch(e) {
+            if (this.onFail) {
+                for (let command of this.onFail) {
+                    await command.execute();
+                }
+            } else {
+                throw(e);
+           }
         }
     }
 
