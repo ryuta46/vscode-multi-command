@@ -6,6 +6,7 @@ export class Command {
     constructor(
         private readonly exe: string,
         private readonly args: object | undefined,
+        private readonly repeat: number,
         private readonly onSuccess: Array<Command> | undefined,
         private readonly onFail: Array<Command> | undefined,
         private readonly variableSubstitution: boolean
@@ -14,13 +15,19 @@ export class Command {
     public async execute() {
         try {
             if (this.args) {
+                let args;
                 if (this.variableSubstitution) {
-                    await vscode.commands.executeCommand(this.exe, this.substituteVariables(this.args));
+                    args = this.substituteVariables(this.args);
                 } else {
-                    await vscode.commands.executeCommand(this.exe, this.args);
+                    args = this.args;
+                }
+                for(let i = 0; i < this.repeat; i++) {
+                    await vscode.commands.executeCommand(this.exe, args);
                 }
             } else {
-                await vscode.commands.executeCommand(this.exe);
+                for(let i = 0; i < this.repeat; i++) {
+                    await vscode.commands.executeCommand(this.exe);
+                }
             }
             if (this.onSuccess) {
                 for (let command of this.onSuccess) {
