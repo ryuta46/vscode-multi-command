@@ -27,7 +27,7 @@ export class Command {
                     await command.execute();
                 }
             }
-        } catch(e: any) {
+        } catch(e) {
             if (this.onFail) {
                 for (let command of this.onFail) {
                     await command.execute();

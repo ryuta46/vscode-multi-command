@@ -133,8 +133,8 @@ export function activate(context: vscode.ExtensionContext) {
                 } else {
                     await pickMultiCommand();
                 }
-            } catch (e: any) {
-                vscode.window.showErrorMessage(`${e.message}`);
+            } catch (e) {
+                vscode.window.showErrorMessage(`${(e as Error).message}`);
             }
         }
     );
