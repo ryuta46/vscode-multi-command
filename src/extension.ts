@@ -49,13 +49,20 @@ function createMultiCommand(
         let onFail: Array<Command> | undefined;
 
         if (typeof command === "string") {
-            exe = command;
+            let conditionedCommands = command.split(" || ")
+            if (conditionedCommands.length > 1) {
+                conditionedCommands = conditionedCommands.map((s) => s.trim());
+                exe = conditionedCommands.shift()!;
+                onFail = [createCommand(conditionedCommands.join(" || "))];
+            } else {
+                exe = command;
+            }
             variableSubstitution = false;
         } else {
             exe = command.command;
             args = command.args;
             variableSubstitution = command.variableSubstitution ?? false;
-            onSuccess = command.onSuccess?.map((c) => createCommand(c));            
+            onSuccess = command.onSuccess?.map((c) => createCommand(c));
             onFail = command.onFail?.map((c) => createCommand(c));
         }
         return new Command(exe, args, onSuccess, onFail, variableSubstitution);
