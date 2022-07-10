@@ -157,6 +157,22 @@ For example:
         },
 ```
 
+If you set `languages` parameter in settings.json, the sequence is displayed only when a document of specified language is opened.
+For example:
+
+```json
+   "multiCommand.commands": [
+        {
+            "command": "multiCommand.eslint",
+            "sequence": [
+                "eslint.executeAutofix",
+            ],
+            "languages": ["javascript", "typescript"]
+        },
+   ]
+```
+`multiCommand.eslint` is displayed only when the opened document is JavaScript or TypeScript.
+
 ### Advanced Settings
 
 #### Pass arguments to commands
