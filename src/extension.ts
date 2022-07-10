@@ -11,6 +11,7 @@ interface CommandSettings {
     description: string;
     interval: number;
     sequence: CommandSequence;
+    languages: Array<string>;
 }
 
 interface CommandSettingsWithKey extends CommandSettings {
@@ -41,6 +42,7 @@ function createMultiCommand(
     const label = settings.label;
     const description = settings.description;
     const interval = settings.interval;
+    const languages = settings.languages;
 
     function createCommand(command: string | ComplexCommand): Command {
         let exe: string;
@@ -75,7 +77,7 @@ function createMultiCommand(
         return createCommand(command);
     });
 
-    return new MultiCommand(id, label, description, interval, sequence);
+    return new MultiCommand(id, label, description, interval, sequence, languages);
 }
 
 let multiCommands: Array<MultiCommand>;
@@ -154,7 +156,15 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 export async function pickMultiCommand() {
-    const picks = multiCommands.map((multiCommand) => {
+    let languageId = vscode.window.activeTextEditor?.document.languageId;
+
+    const picks = multiCommands.filter((multiCommand) => {
+        if (languageId) {
+            return (multiCommand.languages?.indexOf(languageId) ?? 1)  >= 0;
+        } else {
+            return true;
+        }
+    }).map((multiCommand) => {
         return {
             label: multiCommand.label || multiCommand.id,
             description: multiCommand.description || "",

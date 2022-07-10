@@ -6,7 +6,8 @@ export class MultiCommand {
         readonly label: string | undefined,
         readonly description: string | undefined,
         readonly interval: number | undefined,
-        readonly sequence: Array<Command>
+        readonly sequence: Array<Command>,
+        readonly languages: Array<string> | undefined
     ) {}
 
     public async execute() {
