@@ -328,33 +328,3 @@ With Command Runner extension, you can write a command sequence with shell comma
 ```
 
 See the [Command Runner document](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) for details on how to use the extension.
-
-## Release Notes
-
-### 1.5.1
-Support extensionKind ui or workspace.
-
-### 1.5.0
-New Feature: Simple usage only with keybindings.json  
-New Feature: Object style settings for merging user settings and workspace settings.
-
-### 1.4.0
-
-Added new style for binding a key to created commands.
-
-### 1.3.0
-
-New Feature: Manual execution from command palette.
-
-### 1.2.0
-
-New Feature: Pass arguments to commands.
-
-### 1.1.0
-
-Reloads settings.json when the file is changed.  
-Now, you can use a custom multi-command immediately after adding it in the settings.json without restarting vscode.
-
-### 1.0.0
-
-Initial release.
