@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.6.0
+### Added
+- [Variable substitution like `${userHome}` or `${config:editor.fontSize}` in arguments.](/README.md#pass-arguments-to-commands)
+- [Conditioned commands to branch a sequence when a command fails.](/README.md#conditioned-commands)
+- [Parameter to repeat a command.](/README.md#repeat-commands)
+- [Language filter for manual execution.](/README.md#manual-execution)
+
 ## 1.5.1
 ### Added
 - Support extensionKind ui or workspace.
