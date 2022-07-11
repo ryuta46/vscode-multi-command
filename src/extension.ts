@@ -4,11 +4,14 @@ import * as vscode from "vscode";
 import { Command } from "./command";
 import { MultiCommand } from "./multiCommand";
 
+type CommandSequence = Array<string | ComplexCommand>;
+
 interface CommandSettings {
     label: string;
     description: string;
     interval: number;
-    sequence: Array<string | ComplexCommand>;
+    sequence: CommandSequence;
+    languages: Array<string>;
 }
 
 interface CommandSettingsWithKey extends CommandSettings {
@@ -22,6 +25,10 @@ interface CommandMap {
 interface ComplexCommand {
     command: string;
     args: object;
+    repeat: number;
+    onSuccess: CommandSequence | undefined;
+    onFail: CommandSequence | undefined;
+    variableSubstitution: boolean;
 }
 
 function implementsCommandMap(arg: any): arg is CommandSettings {
@@ -35,20 +42,42 @@ function createMultiCommand(
     const label = settings.label;
     const description = settings.description;
     const interval = settings.interval;
-    const sequence = settings.sequence.map((command) => {
+    const languages = settings.languages;
+
+    function createCommand(command: string | ComplexCommand): Command {
         let exe: string;
-        let args: object | null;
+        let args: object | undefined;
+        let repeat: number = 1;
+        let variableSubstitution: boolean;
+        let onSuccess: Array<Command> | undefined;
+        let onFail: Array<Command> | undefined;
+
         if (typeof command === "string") {
-            exe = command;
-            args = null;
+            let conditionedCommands = command.split(" || ")
+            if (conditionedCommands.length > 1) {
+                conditionedCommands = conditionedCommands.map((s) => s.trim());
+                exe = conditionedCommands.shift()!;
+                onFail = [createCommand(conditionedCommands.join(" || "))];
+            } else {
+                exe = command;
+            }
+            variableSubstitution = false;
         } else {
             exe = command.command;
             args = command.args;
+            repeat = command.repeat ?? 1;
+            variableSubstitution = command.variableSubstitution ?? false;
+            onSuccess = command.onSuccess?.map((c) => createCommand(c));
+            onFail = command.onFail?.map((c) => createCommand(c));
         }
-        return new Command(exe, args);
+        return new Command(exe, args, repeat, onSuccess, onFail, variableSubstitution);
+    }
+
+    const sequence = settings.sequence.map((command) => {
+        return createCommand(command);
     });
 
-    return new MultiCommand(id, label, description, interval, sequence);
+    return new MultiCommand(id, label, description, interval, sequence, languages);
 }
 
 let multiCommands: Array<MultiCommand>;
@@ -117,7 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
                     await pickMultiCommand();
                 }
             } catch (e) {
-                vscode.window.showErrorMessage(`${e.message}`);
+                vscode.window.showErrorMessage(`${(e as Error).message}`);
             }
         }
     );
@@ -127,7 +156,15 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 export async function pickMultiCommand() {
-    const picks = multiCommands.map((multiCommand) => {
+    let languageId = vscode.window.activeTextEditor?.document.languageId;
+
+    const picks = multiCommands.filter((multiCommand) => {
+        if (languageId) {
+            return (multiCommand.languages?.indexOf(languageId) ?? 1)  >= 0;
+        } else {
+            return true;
+        }
+    }).map((multiCommand) => {
         return {
             label: multiCommand.label || multiCommand.id,
             description: multiCommand.description || "",

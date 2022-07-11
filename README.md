@@ -34,7 +34,7 @@ This command sequence executes "cursorDown" command 3 times.
 
 ### Usage with settings.json.
 
-This usage is useful for resusing the defined command sequence in another command sequnce or executing the sequence manually.
+This usage is useful for reusing the defined command sequence in another command sequnce or executing the sequence manually.
 
 In case using settings.json, the settings has 2 steps.
 
@@ -157,6 +157,22 @@ For example:
         },
 ```
 
+If you set `languages` parameter in settings.json, the sequence is displayed only when a document of specified language is opened.
+For example:
+
+```json
+   "multiCommand.commands": [
+        {
+            "command": "multiCommand.eslint",
+            "sequence": [
+                "eslint.executeAutofix",
+            ],
+            "languages": ["javascript", "typescript"]
+        },
+   ]
+```
+`multiCommand.eslint` is displayed only when the opened document is JavaScript or TypeScript.
+
 ### Advanced Settings
 
 #### Pass arguments to commands
@@ -175,6 +191,114 @@ For Example:
 ```
 
 This sequence cut selected text and type "CUT !!".
+
+You can also use some variables like `${userHome}` or `${config:editor.fontSize}` in arguments.
+
+Because some commands substitute these kinds of variables in their extensions, variable substitution in multi-command extenstion is kind of experimental.
+
+If you use variable substituion, set `variableSubstitution` to `true` in command setting.
+
+For example: 
+```json
+"sequence": [
+    { 
+        "command": "type",
+        "args": { "text": "Font size is ${config:editor.fontSize}" },
+        "variableSubstitution": true
+    }
+],
+```
+
+Current supported variables:
+
+* `${userHome}`
+* `${workspaceFolder}`
+* `${workspaceFolderBasename}`
+* `${file}`
+* `${fileWorkspaceFolder}`
+* `${relativeFile}`
+* `${relativeFileDirname}`
+* `${fileBasename}`
+* `${fileBasenameNoExtension}`
+* `${fileDirname}`
+* `${fileExtname}`
+* `${cwd}`
+* `${lineNumber}`
+* `${selectedText}`
+* `${pathSeparator}`
+* `${env:*}`
+* `${config:*}`
+
+Contents of each variable are described in [variables reference in VSCode](https://code.visualstudio.com/docs/editor/variables-reference). Note that all variables in the document is not supported in multi-command extension.
+
+#### Repeat commands
+
+The above `multiCommand.down3Lines` sample also written as follows by using `repeat` field:
+
+```json
+{
+    "command": "multiCommand.down3Lines",
+    "label": "down3Lines",
+    "description": "down the cursor in 3 times",
+    "sequence": [
+        { "command": "cursorDown", "repeat": 3 }
+    ],
+}
+```
+You can also repeat a sequence by using `extension.multiCommand.execute` or defined command in settings.json.
+
+```json
+{
+    "sequence": [
+        { 
+            "command": "extension.multiCommand.execute", 
+            "args": {
+                "sequence": [
+                    "editor.action.commentLine",
+                    "cursorDown"
+                ]
+            },
+            "repeat": 5 
+        }
+    ],
+}
+```
+
+This sequence add line comment to next 5 lines.
+
+#### Conditioned commands
+
+A sequence can be branched by the result of whether or not a given command terminated with an error. 
+This feature is useful when you are not sure if an extension is installed or not. You can use an alternative command if the extension is not installed.
+
+For example:
+```json
+{
+    "sequence": [
+        "eslint.executeAutofix || editor.action.formatDocument"
+    ]
+}
+```
+
+Only when `eslint.executeAutofix` finished with an error like command not found, `editor.action.formatDocument` is invoked.
+Note that there must be at least one space on each side of the `||` operator.
+
+For more complex command like passing arguments, use `onFail` field.
+```json
+"sequence": [
+    { 
+        "command": "A",
+        "onFail": [
+            "B",
+            {
+                "command": "C",
+                "args": { "arg": "argumentForC" }
+            },
+        ]
+    }
+]
+```
+Only when command A finished with an error, command B and command C with arguments are invoked.
 
 ### Find the name of the command you want to execute
 
@@ -204,33 +328,3 @@ With Command Runner extension, you can write a command sequence with shell comma
 ```
 
 See the [Command Runner document](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) for details on how to use the extension.
-
-## Release Notes
-
-### 1.5.1
-Support extensionKind ui or workspace.
-
-### 1.5.0
-New Feature: Simple usage only with keybindings.json  
-New Feature: Object style settings for merging user settings and workspace settings.
-
-### 1.4.0
-
-Added new style for binding a key to created commands.
-
-### 1.3.0
-
-New Feature: Manual execution from command palette.
-
-### 1.2.0
-
-New Feature: Pass arguments to commands.
-
-### 1.1.0
-
-Reloads settings.json when the file is changed.  
-Now, you can use a custom multi-command immediately after adding it in the settings.json without restarting vscode.
-
-### 1.0.0
-
-Initial release.
