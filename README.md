@@ -93,7 +93,7 @@ In case using settings.json, the settings has 2 steps.
         "when": "editorTextFocus"
     },
     {
-        "key": "F21",
+        "key": "F2",
         "command": "extension.multiCommand.execute",
         "args": { "command": "multiCommand.swapChar" },
         "when": "editorTextFocus"
