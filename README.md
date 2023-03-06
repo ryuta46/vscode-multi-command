@@ -328,3 +328,9 @@ With Command Runner extension, you can write a command sequence with shell comma
 ```
 
 See the [Command Runner document](https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner) for details on how to use the extension.
+
+### Find all available command ids
+
+> Note: You can review the full set of VS Code commands via the Keyboard Shortcuts editor File > Preferences > Keyboard Shortcuts (on macOS Code > Preferences > Keyboard Shortcuts). The Keyboard Shortcuts editor lists all commands built into VS Code or contributed by extensions, along with their keybindings and visibility when clauses.
+
+From: https://code.visualstudio.com/api/references/commands
