@@ -39,31 +39,72 @@
                         "array",
                         "object"
                     ],
+                    "description": "Command sequence list.",
                     "items": {
                         "type": "object",
-                        "title": "command sequence",
+                        "title": "Command sequence.",
                         "properties": {
                             "command": {
                                 "type": "string",
-                                "description": "command name of this command sequence"
+                                "description": "Command name of this command sequence."
                             },
                             "interval": {
                                 "type": "number",
-                                "description": "time interval(milliseconds) between each command execution."
+                                "description": "Time interval (milliseconds) between each command execution."
                             },
                             "sequence": {
                                 "type": "array",
+                                "description": "Command sequence which been invoked.",
                                 "items": {
                                     "type": [
                                         "string",
                                         "object"
                                     ],
-                                    "description": "command sequence which been invoked"
+                                    "properties": {
+                                        "command": {
+                                            "type": "string",
+                                            "description": "Command ID provided by VS Code or extensions."
+                                        },
+                                        "args": {
+                                            "type": "object",
+                                            "description": "Arguments of command."
+                                        },
+                                        "onSuccess": {
+                                            "type": "array",
+                                            "description": "Excuted when the previous command ends with a success."
+                                        },
+                                        "onFail": {
+                                            "type": "array",
+                                            "description": "Excuted when the previous command ends with an error."
+                                        },
+                                        "variableSubstitution": {
+                                            "type": "boolean",
+                                            "description": "Set to true if you want to use variable substitution starting with $ in args.",
+                                            "enum": [true, false],
+                                            "default": false
+                                        },
+                                        "repeat": {
+                                            "type": "number",
+                                            "description": "Number of times command is repeated.",
+                                            "default": 1
+                                        }
+                                    }
                                 }
+                            },
+                            "languages": {
+                                "type": "array",
+                                "description": "Only visible in the command palette when a document in the specified language is opened. If not specified, it applies to all languages."
+                            },
+                            "label": {
+                                "type": "string",
+                                "description": "Label displayed in command palette when calling command sequence manually."
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Description displayed in command palette when calling command sequence manually. (dimmed)"
                             }
                         }
-                    },
-                    "description": "command sequence list."
+                    }
                 }
             }
         }
